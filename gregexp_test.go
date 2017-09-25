@@ -81,14 +81,16 @@ var testSet = map[string]testCase{
 	},
 }
 
-func TestMatch(t *testing.T) {
+func TestConvert(t *testing.T) {
+	t.Parallel()
+
 	for pattern, cases := range testSet {
 		func(patter string, cases testCase) {
 			t.Run(pattern, func(t *testing.T) {
 				for target, match := range cases {
 					func(pattern, target string, match bool) {
 						t.Run("with "+target, func(t *testing.T) {
-							t.Logf("Match: %s <=> %s", pattern, target)
+							t.Logf("Match: %s <=> %s(%v)", pattern, target, match)
 							r, err := Convert(pattern)
 							if err != nil {
 								t.Fatal(err)
@@ -96,6 +98,56 @@ func TestMatch(t *testing.T) {
 							m := r.MatchString(target)
 							if m != match {
 								t.Logf("Compiled: %s", r.String())
+								t.Errorf("%s <=> %s(expected: %v, actual: %v)", pattern, target, match, m)
+							}
+						})
+					}(pattern, target, match)
+				}
+			})
+		}(pattern, cases)
+	}
+}
+
+func TestMatch(t *testing.T) {
+	t.Parallel()
+
+	for pattern, cases := range testSet {
+		func(patter string, cases testCase) {
+			t.Run(pattern, func(t *testing.T) {
+				for target, match := range cases {
+					func(pattern, target string, match bool) {
+						t.Run("with "+target, func(t *testing.T) {
+							t.Logf("Match: %s <=> %s(%v)", pattern, target, match)
+							m, err := Match(pattern, []byte(target))
+							if err != nil {
+								t.Fatal(err)
+							}
+							if m != match {
+								t.Errorf("%s <=> %s(expected: %v, actual: %v)", pattern, target, match, m)
+							}
+						})
+					}(pattern, target, match)
+				}
+			})
+		}(pattern, cases)
+	}
+}
+
+func TestMatchString(t *testing.T) {
+	t.Parallel()
+
+	for pattern, cases := range testSet {
+		func(patter string, cases testCase) {
+			t.Run(pattern, func(t *testing.T) {
+				for target, match := range cases {
+					func(pattern, target string, match bool) {
+						t.Run("with "+target, func(t *testing.T) {
+							t.Logf("Match: %s <=> %s(%v)", pattern, target, match)
+							m, err := MatchString(pattern, target)
+							if err != nil {
+								t.Fatal(err)
+							}
+							if m != match {
 								t.Errorf("%s <=> %s(expected: %v, actual: %v)", pattern, target, match, m)
 							}
 						})
