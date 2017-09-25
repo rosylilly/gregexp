@@ -81,6 +81,10 @@ var testSet = map[string]testCase{
 	},
 }
 
+var crashCases = []string{
+	"lib/**/{.go",
+}
+
 func TestConvert(t *testing.T) {
 	t.Parallel()
 
@@ -155,5 +159,24 @@ func TestMatchString(t *testing.T) {
 				}
 			})
 		}(pattern, cases)
+	}
+}
+
+func TestCrash(t *testing.T) {
+	var err error
+	for _, pattern := range crashCases {
+		_, err = MatchString(pattern, "lib/test.go")
+		if err == nil {
+			t.Fatal("Required crash")
+		} else {
+			t.Log(pattern + ": " + err.Error())
+		}
+
+		_, err = Match(pattern, []byte("lib/test.go"))
+		if err == nil {
+			t.Fatal("Required crash")
+		} else {
+			t.Log(pattern + ": " + err.Error())
+		}
 	}
 }

@@ -33,6 +33,8 @@ var metaReplacer = strings.NewReplacer(
 	",", "|",
 )
 
+// Match checks whether a path pattern matches a byte slice.
+//
 func Match(pattern string, target []byte) (bool, error) {
 	r, err := Convert(pattern)
 	if err != nil {
@@ -41,6 +43,8 @@ func Match(pattern string, target []byte) (bool, error) {
 	return r.Match(target), nil
 }
 
+// Match checks whether a path pattern matches a string.
+//
 func MatchString(pattern, target string) (bool, error) {
 	r, err := Convert(pattern)
 	if err != nil {
@@ -49,6 +53,8 @@ func MatchString(pattern, target string) (bool, error) {
 	return r.MatchString(target), nil
 }
 
+// Compile parses a path pattern and returns a regexp object, if successful.
+//
 func Convert(pattern string) (*regexp.Regexp, error) {
 	pattern = "^" + metaReplacer.Replace(regexp.QuoteMeta(pattern)) + "$"
 	return regexp.Compile(pattern)
